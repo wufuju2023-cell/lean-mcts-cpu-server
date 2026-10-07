@@ -198,10 +198,15 @@ fi
 if should_run 08; then
   echo
   echo "[8] 冒烟：lake env lean Import.lean（预期 LMC-ENV-OK）"
-  OUT="$(cd "$ROOT/runtime" && "$ELAN_HOME/bin/lake" env lean Import.lean)"
-  echo "$OUT"
-  echo "$OUT" | grep -q "LMC-ENV-OK" || { echo "冒烟失败：未见 LMC-ENV-OK"; exit 1; }
-  mark 08
+  if OUT="$( (cd "$ROOT/runtime" && "$ELAN_HOME/bin/lake" env lean Import.lean) 2>&1 )"; then
+    echo "$OUT"
+    echo "$OUT" | grep -q "LMC-ENV-OK" || { echo "冒烟失败：未见 LMC-ENV-OK"; exit 1; }
+    mark 08
+  else
+    echo "$OUT"
+    echo "冒烟失败：lake env lean Import.lean 非零退出"
+    exit 1
+  fi
 fi
 
 echo
